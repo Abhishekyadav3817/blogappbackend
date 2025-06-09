@@ -13,12 +13,14 @@ export const allBlogs = async (req, res) => {
 export const createBlog = async (req, res) => {
   try {
     const { title, category, description } = req.body;
-    const image_filename = `${req.file.filename}`;
+    const image_url = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+
+
     const blog = await Blog.create({
       title,
       category,
       description,
-      image: image_filename,
+      image: image_url,
       author: {
         id: req.user._id,
         name: req.user.name,
@@ -43,7 +45,13 @@ export const deleteBlog = async (req, res) => {
     .status(403)
     .json({ message: "Not authorized to delete this blog", success: false });
   }
-  fs.unlink(`uploads/${blog.image}`, () => {});
+  
+const filename = blog.image.split("/uploads/")[1];
+fs.unlink(`uploads/${filename}`, (err) => {
+  if (err) console.error("Error deleting file:", err);
+});
+
+
   await blog.deleteOne();
   return res
     .status(404)

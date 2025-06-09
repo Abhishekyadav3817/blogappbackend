@@ -10,7 +10,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.use("/images", express.static("uploads"));
+app.use("/uploads", express.static("uploads")); 
+
 app.use("/user", userRoutes);
 app.use("/blog", blogRoutes);
 const PORT = 4000;
